@@ -18,10 +18,20 @@ def create_metrics(ref, test, ref_regrid, test_regrid, diff):
         'max': max_cdms(ref),
         'mean': mean(ref)
     }
+    metrics_dict['ref_reg'] = {
+        'min': min_cdms(ref_regrid),
+        'max': max_cdms(ref_regrid),
+        'mean': mean(ref_regrid)
+    }
     metrics_dict['test'] = {
         'min': min_cdms(test),
         'max': max_cdms(test),
         'mean': mean(test)
+    }
+    metrics_dict['test_regrid'] = {
+        'min': min_cdms(test_regrid),
+        'max': max_cdms(test_regrid),
+        'mean': mean(test_regrid)
     }
 
     metrics_dict['diff'] = {

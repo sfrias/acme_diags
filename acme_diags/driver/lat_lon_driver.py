@@ -6,8 +6,10 @@ from acme_diags.plot import plot
 from acme_diags.derivations import acme
 from acme_diags.metrics import rmse, corr, min_cdms, max_cdms, mean
 from acme_diags.driver import utils
+from acme_diags.driver.utils import get_output_dir
 import os
 import sys
+import json
 
 
 def create_metrics(ref, test, ref_regrid, test_regrid, diff):
@@ -180,6 +182,12 @@ def run_diag(parameter):
                         diff = mv1_reg - mv2_reg
                         metrics_dict = create_metrics(
                             mv2_domain, mv1_domain, mv2_reg, mv1_reg, diff)
+                        
+                        fnm = os.path.join(get_output_dir(
+                            parameter.current_set, parameter), parameter.output_file)
+                        with open(fnm + '.json' , 'wb') as outfile:
+                             json.dump(metrics_dict,outfile)
+                        print('Metrics saved in: ' + fnm + '.json')
 
                         parameter.var_region = region
                         plot(parameter.current_set, mv2_domain,
@@ -229,6 +237,13 @@ def run_diag(parameter):
                     diff = mv1_reg - mv2_reg
                     metrics_dict = create_metrics(
                         mv2_domain, mv1_domain, mv2_reg, mv1_reg, diff)
+
+                    fnm = os.path.join(get_output_dir(
+                        parameter.current_set, parameter), parameter.output_file)
+                    with open(fnm + '.json' , 'wb') as outfile:
+                         json.dump(metrics_dict,outfile)
+                    print('Metrics saved in: ' + fnm + '.json')
+
                     parameter.var_region = region
                     plot(parameter.current_set, mv2_domain,
                          mv1_domain, diff, metrics_dict, parameter)

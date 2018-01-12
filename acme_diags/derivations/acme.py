@@ -578,7 +578,9 @@ derived_variables = {
         (('V'), lambda u: convert_units(u, target_units="m/s"))
     ]),
     'TREFHT': OrderedDict([
-        (('TREFHT'), lambda t: convert_units(t, target_units="K"))
+        (('TREFHT'), lambda t: convert_units(t, target_units="K")),
+        (('tas'), rename) 
+        #(('tas'), lambda t: convert_units(t, target_units="K"))
     ]),
     'QFLX': OrderedDict([
         (('QFLX'), lambda qflx: qflxconvert_units(qflx))

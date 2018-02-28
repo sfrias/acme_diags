@@ -74,9 +74,9 @@ def run_diag(parameter):
     ref_name = parameter.ref_name
     regions = parameter.regions
 
-    if getattr(parameter, 'multiprocessing', False):
-        # only force mpl when running with multiprocessing
-        parameter.backend = 'mpl'
+    #if getattr(parameter, 'multiprocessing', False):
+    #    # only force mpl when running with multiprocessing
+    #    parameter.backend = 'mpl'
 
     for season in seasons:
         try:

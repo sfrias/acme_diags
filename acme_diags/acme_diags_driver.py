@@ -12,11 +12,54 @@ import datetime
 import importlib
 import traceback
 import subprocess
+import StringIO
 import cdp.cdp_run
 from acme_diags.acme_parser import ACMEParser
 from acme_diags.acme_viewer import create_viewer
 from acme_diags.driver.utils import get_set_name, SET_NAMES
 
+
+class PrintAndLog(object):
+    """
+    Prints and logs whatever steam is passed in.
+    Used for storing a log of stdout and stderr.
+    """
+    def __init__(self, stream):
+        self.stream = stream
+        # self.file_buffer = StringIO.StringIO()
+        self._log = StringIO.StringIO()  # open(self.filename, 'w')
+
+    def write(self, msg):
+        """
+        Write a message to the steam and save it to the file buffer.
+        """
+        self.stream.write(msg)  # Display the message
+        self._log.write(msg)  # Write the message to the file
+
+    def save(self, filename):
+        """
+        Save the buffer containing the messages to a file.
+        """
+        dir_name = os.path.dirname(filename)
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
+        with open(filename) as f:
+            f.write(self._log)
+
+def save(stream, filename):
+    """
+    Given a stream, save the contents to a file.
+    """
+    dir_name = os.path.dirname(filename)
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
+    #with open(filename, 'w') as f:
+    #    # f.write(stream.buffer)
+    #    f.write(stream)
+    #stream.seek(0)
+    with open(filename, 'w') as f:
+        for line in stream:
+            f.write(line)
 
 def _get_default_diags(set_num, dataset, run_type):
     """Returns the path for the default diags corresponding to set_num"""
@@ -56,7 +99,11 @@ def provenance(results_dir):
     cmd = 'conda list'
     p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, err = p.communicate()
-    fnm = os.path.join(results_dir, 'prov.txt')
+    fnm = os.path.join(results_dir, 'prov', 'env_prov.txt')
+
+    dir_name = os.path.dirname(fnm)
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
 
     with file(fnm, 'w') as f:
         f.write(output)
@@ -88,6 +135,9 @@ def run_diag(parameters):
 
 
 def main():
+    # sys.stdout = PrintAndLog(sys.stdout)
+    # sys.stderr = PrintAndLog(sys.stderr)
+
     parser = ACMEParser()
     args = parser.view_args()
 
@@ -170,7 +220,13 @@ def main():
             if not os.path.exists(pth):
                 os.makedirs(pth)
             create_viewer(pth, parameters, parameters[0].output_format[0])
-
+    
+            stdout_fnm = os.path.join(parameters[0].results_dir, 'prov', 'stdout.log')
+            stderr_fnm = os.path.join(parameters[0].results_dir, 'prov', 'stderr.log')
+            #sys.stdout.save(stdout_fnm)
+            #sys.stderr.save(stderr_fnm)
+            save(sys.stdout, stdout_fnm)
+            save(sys.stderr, stderr_fnm)
 
 if __name__ == '__main__':
     main()
